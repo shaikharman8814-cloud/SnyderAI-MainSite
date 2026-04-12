@@ -10,6 +10,7 @@ import {
   Menu,
   X,
   ChevronRight,
+  ChevronDown,
   Globe,
   Zap,
   Shield,
@@ -31,7 +32,9 @@ import {
   GraduationCap,
   Mail,
   Send,
-  Plus
+  Plus,
+  ArrowUp,
+  Search as SearchIcon
 } from 'lucide-react';
 import * as d3 from 'd3';
 import { LoginPage } from './LoginPage';
@@ -361,11 +364,12 @@ const PricingSection = () => {
   );
 };
 
-const Navbar = ({ isDark, toggleTheme, onOpenModal, user }: { isDark: boolean; toggleTheme: () => void; onOpenModal: (type: string) => void; user: User | null }) => {
+const Navbar = ({ isDark, toggleTheme, onOpenModal, onOpenSearch, user }: { isDark: boolean; toggleTheme: () => void; onOpenModal: (type: string) => void; onOpenSearch: () => void; user: User | null }) => {
 
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
+  const [isLoginDropdownOpen, setIsLoginDropdownOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
@@ -419,12 +423,12 @@ const Navbar = ({ isDark, toggleTheme, onOpenModal, user }: { isDark: boolean; t
       <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
         <div className="flex items-center gap-8">
           <a href="/" className="text-xl font-bold tracking-tighter">SnyderAI</a>
-          <div className="hidden md:flex items-center gap-6">
+          <div className="hidden lg:flex items-center gap-4 xl:gap-8">
             {Object.keys(menuData).map((key) => (
               <span
                 key={key}
                 onMouseEnter={() => setActiveMenu(key)}
-                className={`nav-link cursor-pointer transition-opacity ${activeMenu && activeMenu !== key ? 'opacity-40' : 'opacity-100'}`}
+                className={`nav-link cursor-pointer transition-opacity text-sm font-medium ${activeMenu && activeMenu !== key ? 'opacity-40' : 'opacity-100'}`}
               >
                 {key}
               </span>
@@ -432,8 +436,8 @@ const Navbar = ({ isDark, toggleTheme, onOpenModal, user }: { isDark: boolean; t
           </div>
         </div>
 
-        <div className="flex items-center gap-4">
-          <div className="hidden md:flex items-center gap-4">
+        <div className="flex items-center gap-3 lg:gap-4">
+          <div className="hidden lg:flex items-center gap-3 xl:gap-4">
             <button
               onClick={toggleTheme}
               className="p-2 hover:bg-black/5 dark:hover:bg-white/5 rounded-full transition-colors"
@@ -441,18 +445,37 @@ const Navbar = ({ isDark, toggleTheme, onOpenModal, user }: { isDark: boolean; t
             >
               {isDark ? <Sun size={20} /> : <Moon size={20} />}
             </button>
-            <span className="nav-link">Search</span>
+            <button
+              onClick={onOpenSearch}
+              className="nav-link text-sm"
+            >
+              Search
+            </button>
+            <a href="https://aetheris-ai-iota.vercel.app" target="_blank" rel="noopener noreferrer" className="nav-link text-sm">Aethris</a>
+            <a href="https://nearby-students-rose.vercel.app" target="_blank" rel="noopener noreferrer" className="nav-link text-sm">SocialNet</a>
+            <a href="https://nearby-students-rose.vercel.app" target="_blank" rel="noopener noreferrer" className="nav-link text-sm">nearbystudetns</a>
+            <a
+              href="/login"
+              onClick={(e) => {
+                e.preventDefault();
+                window.history.pushState({}, '', '/login');
+                window.dispatchEvent(new PopStateEvent('popstate'));
+              }}
+              className="nav-link text-sm"
+            >
+              API Platform
+            </a>
             {user ? (
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-3">
                 <div className="flex flex-col items-end">
-                  <span className="text-xs font-medium opacity-50">Signed in as</span>
-                  <span className="text-sm font-bold tracking-tighter">
+                  <span className="text-[10px] font-medium opacity-50">Signed in</span>
+                  <span className="text-xs font-bold tracking-tighter truncate max-w-[80px]">
                     {user.displayName || user.email?.split('@')[0] || 'User'}
                   </span>
                 </div>
                 <button
                   onClick={() => signOut(auth)}
-                  className="px-4 py-2 bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 rounded-full text-xs font-mono uppercase tracking-widest transition-colors"
+                  className="px-3 py-1.5 bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 rounded-full text-[10px] font-mono uppercase tracking-widest transition-colors"
                 >
                   Log out
                 </button>
@@ -465,23 +488,22 @@ const Navbar = ({ isDark, toggleTheme, onOpenModal, user }: { isDark: boolean; t
                   window.history.pushState({}, '', '/login');
                   window.dispatchEvent(new PopStateEvent('popstate'));
                 }}
-                className="nav-link"
+                className="nav-link text-sm"
               >
                 Log in
               </a>
             )}
             <a
-
               href="https://aetheris-ai-iota.vercel.app"
               target="_blank"
               rel="noopener noreferrer"
-              className="btn-secondary inline-block"
+              className="btn-secondary !py-2 !px-4 text-xs xl:text-sm inline-block"
             >
               Try Aetheris
             </a>
           </div>
           <button
-            className="md:hidden p-2"
+            className="lg:hidden p-2 hover:bg-black/5 dark:hover:bg-white/5 rounded-xl transition-colors"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
             {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -539,8 +561,14 @@ const Navbar = ({ isDark, toggleTheme, onOpenModal, user }: { isDark: boolean; t
             exit={{ opacity: 0, y: -20 }}
             className="absolute top-full left-0 right-0 bg-white dark:bg-[#050505] border-b border-black/5 dark:border-white/5 p-6 md:hidden flex flex-col gap-4"
           >
-            <span className="text-lg font-medium">Research</span>
-            <span className="text-lg font-medium">Aetheris</span>
+            <a
+              href="https://aetheris-ai-iota.vercel.app"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-lg font-medium"
+            >
+              Aethris
+            </a>
             <a
               href="https://nearby-students-rose.vercel.app"
               target="_blank"
@@ -549,6 +577,26 @@ const Navbar = ({ isDark, toggleTheme, onOpenModal, user }: { isDark: boolean; t
             >
               SocialNet
             </a>
+            <a
+              href="https://nearby-students-rose.vercel.app"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-lg font-medium"
+            >
+              nearbystudetns
+            </a>
+            <span className="text-lg font-medium">API Platform</span>
+            <hr className="border-black/5 dark:border-white/5" />
+            <button
+              onClick={() => {
+                onOpenSearch();
+                setIsMenuOpen(false);
+              }}
+              className="text-lg font-medium text-left"
+            >
+              Search
+            </button>
+            <span className="text-lg font-medium">Research</span>
             <span className="text-lg font-medium">Safety</span>
             <span className="text-lg font-medium">Company</span>
             {user ? (
@@ -1807,9 +1855,89 @@ const ContactPortal = () => {
   );
 };
 
+const SearchOverlay = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
+  const [query, setQuery] = useState('');
+  const [response, setResponse] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
+
+  const handleSearch = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (!query.trim()) return;
+
+    setIsTyping(true);
+    setResponse('');
+
+    const fullResponse = "SnyderAI is a pioneering research lab focused on Agentic AI. Our flagship model, Aetheris, is a physical-world intelligence engine designed for autonomous reasoning and spatial awareness. Together, they form the backbone of a new era in distributed cognitive systems.";
+
+    let i = 0;
+    const interval = setInterval(() => {
+      setResponse((prev) => prev + fullResponse.charAt(i));
+      i++;
+      if (i >= fullResponse.length) {
+        clearInterval(interval);
+        setIsTyping(false);
+      }
+    }, 20);
+  };
+
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-[100] bg-white dark:bg-[#050505] flex flex-col items-center pt-40 px-6"
+        >
+          <button
+            onClick={onClose}
+            className="absolute top-8 right-8 p-4 hover:bg-black/5 dark:hover:bg-white/5 rounded-full transition-colors"
+          >
+            <X size={32} />
+          </button>
+
+          <div className="w-full max-w-3xl">
+            <form onSubmit={handleSearch} className="relative mb-8 md:mb-16">
+              <input
+                autoFocus
+                type="text"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Ask me about Snyder AI"
+                className="w-full bg-transparent border-none text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-serif italic focus:outline-none placeholder:opacity-20 pr-16"
+              />
+              <button
+                type="submit"
+                className="absolute right-0 top-1/2 -translate-y-1/2 w-10 h-10 md:w-14 md:h-14 bg-black dark:bg-white text-white dark:text-black rounded-full flex items-center justify-center hover:opacity-80 transition-all hover:scale-105 active:scale-95 shadow-xl"
+              >
+                <ArrowUp size={24} />
+              </button>
+            </form>
+
+            <AnimatePresence>
+              {response && (
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="text-lg sm:text-2xl md:text-3xl font-light leading-relaxed text-neutral-500 dark:text-neutral-400 tracking-tight"
+                >
+                  {response}
+                  {isTyping && <span className="inline-block w-1 h-6 md:h-8 bg-black dark:bg-white ml-2 animate-pulse align-middle" />}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+};
+
+
 export default function App() {
-  const [isDark, setIsDark] = useState(false);
+  const [isDark, setIsDark] = useState(true);
   const [modalType, setModalType] = useState<string | null>(null);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [currentPath, setCurrentPath] = useState(window.location.pathname);
   const [user, setUser] = useState<User | null>(null);
 
@@ -1838,109 +1966,111 @@ export default function App() {
   const toggleTheme = () => setIsDark(!isDark);
   const openModal = (type: string) => setModalType(type);
   const closeModal = () => setModalType(null);
-
-  if (currentPath === '/login' && !user) {
-    return <LoginPage isDark={isDark} toggleTheme={toggleTheme} />;
-  }
+  const openSearch = () => setIsSearchOpen(true);
+  const closeSearch = () => setIsSearchOpen(false);
 
   return (
     <div className="min-h-screen selection:bg-black dark:selection:bg-white selection:text-white dark:selection:text-black">
-      <Navbar isDark={isDark} toggleTheme={toggleTheme} onOpenModal={openModal} user={user} />
+      <Navbar isDark={isDark} toggleTheme={toggleTheme} onOpenModal={openModal} onOpenSearch={openSearch} user={user} />
 
 
-      <main>
-        <Hero />
-        <LogoCloud />
-        <AetherisAbout />
-        <AgenticTransition />
-        <Playground />
+      {currentPath === '/login' && !user ? (
+        <LoginPage isDark={isDark} toggleTheme={toggleTheme} />
+      ) : (
+        <main>
+          <Hero />
+          <LogoCloud />
+          <AetherisAbout />
+          <AgenticTransition />
+          <Playground />
 
-        <section className="border-y border-black/10 dark:border-white/10">
-          <div className="max-w-7xl mx-auto">
-            <div className="grid grid-cols-1 md:grid-cols-3">
+          <section className="border-y border-black/10 dark:border-white/10">
+            <div className="max-w-7xl mx-auto">
+              <div className="grid grid-cols-1 md:grid-cols-3">
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  whileInView={{ opacity: 1 }}
+                  viewport={{ once: true }}
+                  className="border-r border-black/10 dark:border-white/10 last:border-r-0"
+                >
+                  <FeatureCard
+                    title="Aetheris for Enterprise"
+                    description="Empower your team with the most advanced AI assistant, built with enterprise-grade security and privacy."
+                    icon={Shield}
+                    linkText="Learn more"
+                  />
+                </motion.div>
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  whileInView={{ opacity: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.1 }}
+                  className="border-r border-black/10 dark:border-white/10 last:border-r-0"
+                >
+                  <FeatureCard
+                    title="SocialNet Integration"
+                    description="Connect your applications to the world's most powerful social AI infrastructure."
+                    icon={Cpu}
+                    linkText="Try SocialNet"
+                    href="https://nearby-students-rose.vercel.app"
+                  />
+                </motion.div>
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  whileInView={{ opacity: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.2 }}
+                  className="border-r border-black/10 dark:border-white/10 last:border-r-0"
+                >
+                  <FeatureCard
+                    title="Safety & Alignment"
+                    description="Our commitment to building safe and beneficial AI that aligns with human values."
+                    icon={Zap}
+                    linkText="Read our charter"
+                  />
+                </motion.div>
+              </div>
+            </div>
+          </section>
+
+          <SocialNetSection />
+          <GlobalNodeMap />
+          <ResearchIndex />
+          <CaseStudies />
+          <FutureHorizons />
+          <AetherisRoadmap />
+          <TechnicalFAQ />
+          <CareersPortal />
+          <ContactPortal />
+
+          <PricingSection />
+
+          <section className="py-32 bg-neutral-50 dark:bg-neutral-900/50">
+            <div className="max-w-7xl mx-auto px-6 text-center">
               <motion.div
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                className="border-r border-black/10 dark:border-white/10 last:border-r-0"
               >
-                <FeatureCard
-                  title="Aetheris for Enterprise"
-                  description="Empower your team with the most advanced AI assistant, built with enterprise-grade security and privacy."
-                  icon={Shield}
-                  linkText="Learn more"
-                />
-              </motion.div>
-              <motion.div
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.1 }}
-                className="border-r border-black/10 dark:border-white/10 last:border-r-0"
-              >
-                <FeatureCard
-                  title="SocialNet Integration"
-                  description="Connect your applications to the world's most powerful social AI infrastructure."
-                  icon={Cpu}
-                  linkText="Try SocialNet"
-                  href="https://nearby-students-rose.vercel.app"
-                />
-              </motion.div>
-              <motion.div
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.2 }}
-                className="border-r border-black/10 dark:border-white/10 last:border-r-0"
-              >
-                <FeatureCard
-                  title="Safety & Alignment"
-                  description="Our commitment to building safe and beneficial AI that aligns with human values."
-                  icon={Zap}
-                  linkText="Read our charter"
-                />
+                <h2 className="text-5xl md:text-7xl font-serif italic mb-12">
+                  Join the future of AI.
+                </h2>
+                <div className="flex justify-center gap-6">
+                  <a
+                    href="https://aetheris-ai-iota.vercel.app"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn-primary px-10 py-5 text-xl"
+                  >
+                    Get started with Aetheris
+                  </a>
+                  <button className="btn-secondary px-10 py-5 text-xl">View careers</button>
+                </div>
               </motion.div>
             </div>
-          </div>
-        </section>
-
-        <SocialNetSection />
-        <GlobalNodeMap />
-        <ResearchIndex />
-        <CaseStudies />
-        <FutureHorizons />
-        <AetherisRoadmap />
-        <TechnicalFAQ />
-        <CareersPortal />
-        <ContactPortal />
-
-        <PricingSection />
-
-        <section className="py-32 bg-neutral-50 dark:bg-neutral-900/50">
-          <div className="max-w-7xl mx-auto px-6 text-center">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-            >
-              <h2 className="text-5xl md:text-7xl font-serif italic mb-12">
-                Join the future of AI.
-              </h2>
-              <div className="flex justify-center gap-6">
-                <a
-                  href="https://aetheris-ai-iota.vercel.app"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn-primary px-10 py-5 text-xl"
-                >
-                  Get started with Aetheris
-                </a>
-                <button className="btn-secondary px-10 py-5 text-xl">View careers</button>
-              </div>
-            </motion.div>
-          </div>
-        </section>
-      </main>
+          </section>
+        </main>
+      )}
 
       <Footer onOpenModal={openModal} />
 
@@ -1955,6 +2085,7 @@ export default function App() {
       </AnimatePresence>
 
       <FomoPopup />
+      <SearchOverlay isOpen={isSearchOpen} onClose={closeSearch} />
     </div>
   );
 }

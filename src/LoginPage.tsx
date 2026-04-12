@@ -98,27 +98,7 @@ export const LoginPage = ({ isDark, toggleTheme }: { isDark: boolean; toggleThem
 
     return (
         <div className="min-h-screen bg-white dark:bg-[#050505] text-black dark:text-white flex flex-col selection:bg-black dark:selection:bg-white selection:text-white dark:selection:text-black">
-            <nav className="p-6 flex justify-between items-center z-10 border-b border-black/5 dark:border-white/5">
-                <a
-                    href="/"
-                    onClick={(e) => {
-                        e.preventDefault();
-                        window.history.pushState({}, '', '/');
-                        window.dispatchEvent(new PopStateEvent('popstate'));
-                    }}
-                    className="flex items-center gap-2 hover:opacity-70 transition-opacity"
-                >
-                    <ArrowLeft size={20} />
-                    <span className="text-xl font-bold tracking-tighter">SnyderAI</span>
-                </a>
-                <button
-                    onClick={toggleTheme}
-                    className="p-2 hover:bg-black/5 dark:hover:bg-white/5 rounded-full transition-colors"
-                    aria-label="Toggle theme"
-                >
-                    {isDark ? <Sun size={20} /> : <Moon size={20} />}
-                </button>
-            </nav>
+
 
             <div className="flex-grow flex items-center justify-center p-6 relative overflow-hidden">
                 {/* Background Accents */}
